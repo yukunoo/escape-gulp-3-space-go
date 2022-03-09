@@ -1,6 +1,8 @@
 const gulp = require('gulp');
 const $ = require('gulp-load-plugins')();
 const browserSync = require('browser-sync');
+const sass = require('gulp-sass');
+const postcss = require('gulp-postcss');
 const autoprefixer = require('autoprefixer');
 const minimist = require('minimist'); // 用來讀取指令轉成變數
 const gulpSequence = require('gulp-sequence').use(gulp);
@@ -80,3 +82,18 @@ gulp.task('sequence', gulpSequence('clean', 'ejs', 'sass', 'babel', 'vendorJs', 
 
 gulp.task('default', ['ejs', 'sass', 'browserSync', 'watch']);
 gulp.task('build', ['sequence'])
+
+/* --- SCSS 編譯 --- */
+gulp.task('sass', () => {
+  return gulp
+    .src('./source/stylesheets/*.scss')
+    .pipe(
+      sass({
+        outputStyle: 'compressed', // 執行壓縮
+        includePaths: ['node_modules/bootstrap/scss/'], // 導入 sass 模塊可能路徑
+      }).on('error', sass.logError)
+    )
+    .pipe(postcss([autoprefixer()])) // 加入 CSS Prefix
+    .pipe(gulp.dest('./public/stylesheets'));
+});
+
